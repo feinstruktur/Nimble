@@ -17,7 +17,7 @@ internal func isCloseTo(actualValue: NMBDoubleConvertible?, expectedValue: NMBDo
 /// @see equal
 public func beCloseTo(expectedValue: Double, within delta: Double = DefaultDelta) -> NonNilMatcherFunc<Double> {
     return NonNilMatcherFunc { actualExpression, failureMessage in
-        return isCloseTo(try actualExpression.evaluate(), expectedValue: expectedValue, delta: delta, failureMessage: failureMessage)
+        return isCloseTo(actualValue: try actualExpression.evaluate(), expectedValue: expectedValue, delta: delta, failureMessage: failureMessage)
     }
 }
 
@@ -27,7 +27,7 @@ public func beCloseTo(expectedValue: Double, within delta: Double = DefaultDelta
 /// @see equal
 public func beCloseTo(expectedValue: NMBDoubleConvertible, within delta: Double = DefaultDelta) -> NonNilMatcherFunc<NMBDoubleConvertible> {
     return NonNilMatcherFunc { actualExpression, failureMessage in
-        return isCloseTo(try actualExpression.evaluate(), expectedValue: expectedValue, delta: delta, failureMessage: failureMessage)
+        return isCloseTo(actualValue: try actualExpression.evaluate(), expectedValue: expectedValue, delta: delta, failureMessage: failureMessage)
     }
 }
 
@@ -40,7 +40,7 @@ public class NMBObjCBeCloseToMatcher : NSObject, NMBMatcher {
         _delta = within
     }
 
-    public func matches(actualExpression: () -> NSObject!, failureMessage: FailureMessage, location: SourceLocation) -> Bool {
+    public func matches(actualBlock actualExpression: () -> NSObject!, failureMessage: FailureMessage, location: SourceLocation) -> Bool {
         let actualBlock: () -> NMBDoubleConvertible? = ({
             return actualExpression() as? NMBDoubleConvertible
         })
@@ -81,7 +81,7 @@ public func beCloseTo(expectedValues: [Double], within delta: Double = DefaultDe
             if actual.count != expectedValues.count {
                 return false
             } else {
-                for (index, actualItem) in actual.enumerate() {
+                for (index, actualItem) in actual.enumerated() {
                     if fabs(actualItem - expectedValues[index]) > delta {
                         return false
                     }
@@ -101,11 +101,11 @@ infix operator ≈ {
 }
 
 public func ≈(lhs: Expectation<[Double]>, rhs: [Double]) {
-    lhs.to(beCloseTo(rhs))
+    lhs.to(matcher: beCloseTo(rhs))
 }
 
 public func ≈(lhs: Expectation<NMBDoubleConvertible>, rhs: NMBDoubleConvertible) {
-    lhs.to(beCloseTo(rhs))
+    lhs.to(matcher: beCloseTo(rhs))
 }
 
 public func ≈(lhs: Expectation<NMBDoubleConvertible>, rhs: (expected: NMBDoubleConvertible, delta: Double)) {
